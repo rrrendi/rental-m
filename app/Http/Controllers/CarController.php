@@ -22,11 +22,11 @@ class CarController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'no_polisi' => 'required|unique:cars,no_polisi',
-            'merk' => 'required|string|max:255',
-            'jenis' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+            'no_polisi' => 'required|unique:cars',
+            'merk' => 'required',
+            'jenis' => 'required',
+            'harga' => 'required|numeric',
+            'foto' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
         if ($request->hasFile('foto')) {
@@ -35,8 +35,7 @@ class CarController extends Controller
         }
 
         Car::create($validated);
-
-        return redirect()->route('mobil.index')->with('success', 'Data mobil berhasil ditambahkan ke dalam sistem.');
+        return redirect()->route('cars.index')->with('success', 'Data mobil berhasil ditambahkan.');
     }
 
     public function edit(Car $car)
@@ -48,33 +47,26 @@ class CarController extends Controller
     {
         $validated = $request->validate([
             'no_polisi' => 'required|unique:cars,no_polisi,' . $car->id,
-            'merk' => 'required|string|max:255',
-            'jenis' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+            'merk' => 'required',
+            'jenis' => 'required',
+            'harga' => 'required|numeric',
+            'foto' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
         if ($request->hasFile('foto')) {
-            if ($car->foto) {
-                Storage::disk('public')->delete($car->foto);
-            }
+            if ($car->foto) Storage::disk('public')->delete($car->foto);
             $path = $request->file('foto')->store('cars', 'public');
             $validated['foto'] = $path;
         }
 
         $car->update($validated);
-
-        return redirect()->route('mobil.index')->with('success', 'Data mobil berhasil diperbarui.');
+        return redirect()->route('cars.index')->with('success', 'Data mobil berhasil diperbarui.');
     }
 
     public function destroy(Car $car)
     {
-        if ($car->foto) {
-            Storage::disk('public')->delete($car->foto);
-        }
-        
+        if ($car->foto) Storage::disk('public')->delete($car->foto);
         $car->delete();
-
-        return redirect()->route('mobil.index')->with('success', 'Data mobil berhasil dihapus dari sistem.');
+        return redirect()->route('cars.index')->with('success', 'Data mobil berhasil dihapus.');
     }
 }

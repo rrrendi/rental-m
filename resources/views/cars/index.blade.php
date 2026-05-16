@@ -37,8 +37,8 @@
                                 @endif
                             </td>
                             <td class="py-4 px-4 flex space-x-1">
-                                <a href="{{ route('mobil.edit', $car->id) }}" class="bg-[#00c0ef] text-white px-3 py-1.5 rounded text-xs shadow-sm hover:bg-cyan-500">Edit</a>
-                                <form action="{{ route('mobil.destroy', $car->id) }}" method="POST" class="inline">
+                                <a href="{{ route('cars.edit', $car->id) }}" class="bg-[#00c0ef] text-white px-3 py-1.5 rounded text-xs shadow-sm hover:bg-cyan-500">Edit</a>
+                                <form action="{{ route('cars.destroy', $car->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="bg-[#dd4b39] text-white px-3 py-1.5 rounded text-xs shadow-sm hover:bg-red-600" onclick="return confirm('Hapus data mobil ini?')">Delete</button>
                                 </form>
@@ -61,7 +61,7 @@
                         </button>
                     </div>
 
-                    <form action="{{ route('mobil.store') }}" method="POST" enctype="multipart/form-data" class="p-6">
+                    <form action="{{ route('cars.store') }}" method="POST" enctype="multipart/form-data" class="p-6">
                         @csrf
                         
                         @if($errors->any())

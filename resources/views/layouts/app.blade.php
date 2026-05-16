@@ -37,12 +37,12 @@
                     <span class="font-medium text-sm">Transaksi</span>
                 </a>
 
-                <a href="{{ route('laporan.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('laporan.*') ? 'border-l-4 border-[#0098f0] text-[#0098f0] bg-[#f0f8ff] w-[calc(100%-1rem)] rounded-r-full' : 'text-gray-600 hover:bg-gray-50 hover:text-[#0098f0]' }} transition-colors">
+                <a href="{{ route('reports.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('reports.*') ? 'border-l-4 border-[#0098f0] text-[#0098f0] bg-[#f0f8ff] w-[calc(100%-1rem)] rounded-r-full' : 'text-gray-600 hover:bg-gray-50 hover:text-[#0098f0]' }} transition-colors">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     <span class="font-medium text-sm">Laporan Transaksi</span>
                 </a>
 
-                <a href="{{ route('mobil.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('mobil.*') ? 'border-l-4 border-[#0098f0] text-[#0098f0] bg-[#f0f8ff] w-[calc(100%-1rem)] rounded-r-full' : 'text-gray-600 hover:bg-gray-50 hover:text-[#0098f0]' }} transition-colors">
+                <a href="{{ route('cars.index') }}" class="flex items-center px-6 py-3 {{ request()->routeIs('cars.*') ? 'border-l-4 border-[#0098f0] text-[#0098f0] bg-[#f0f8ff] w-[calc(100%-1rem)] rounded-r-full' : 'text-gray-600 hover:bg-gray-50 hover:text-[#0098f0]' }} transition-colors">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                     <span class="font-medium text-sm">Mobil</span>
                 </a>
@@ -63,14 +63,14 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             
-            <div class="flex items-center space-x-2 bg-transparent py-1 px-2 rounded-md hover:bg-white hover:shadow-sm transition-all" x-data="{ open: false }">
-                <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+            <div x-data="{ open: false }" class="relative z-50">
+                <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none bg-transparent py-1 px-2 rounded-md hover:bg-white hover:shadow-sm transition-all">
                     <img src="https://i.pravatar.cc/150?u={{ Auth::user()->email }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-gray-200">
                     <span class="text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
                     <svg class="w-4 h-4 text-gray-500 transition-transform" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
                 
-                <div x-show="open" @click.away="open = false" x-transition.opacity class="absolute right-6 top-14 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-100 z-50" style="display: none;">
+                <div x-show="open" @click.away="open = false" x-transition.opacity class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-100" style="display: none;">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#dd4b39] transition-colors">
@@ -92,7 +92,7 @@
         </main>
 
         <div class="absolute bottom-6 right-6 z-40">
-            <button onclick="document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' })" class="w-12 h-12 bg-[#0098f0] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-blue-600 transition-all focus:outline-none">
+            <button onclick="document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' })" class="w-12 h-12 bg-[#00c0ef] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-cyan-500 transition-all focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m-7 7l7-7 7 7"></path>
                 </svg>
