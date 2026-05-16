@@ -6,76 +6,92 @@ use App\Models\Transaction;
 use App\Models\Car;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
     public function index()
     {
-        $transactions = Transaction::with(['car', 'user'])->latest()->get();
-        $cars = Car::all();
         $users = User::all();
-        
-        return view('transactions.index', compact('transactions', 'cars', 'users'));
+        $cars = Car::all();
+
+        if (auth()->user()->role == 'admin') {
+            $transactions = Transaction::with(['car', 'user'])->latest()->get();
+        } else {
+            $transactions = Transaction::with(['car'])->where('user_id', auth()->id())->latest()->get();
+        }
+
+        return view('transactions.index', compact('transactions', 'users', 'cars'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'car_id' => 'required|exists:cars,id',
-            'tanggal_sewa' => 'required|date',
-            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_sewa',
+            'tanggal_pinjam' => 'required|date|after_or_equal:today',
+            'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Cek Ketersediaan Mobil (Mencegah Overbooking)
-        $isBooked = Transaction::where('car_id', $request->car_id)
-            ->where('status', 'aktif')
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('tanggal_sewa', [$request->tanggal_sewa, $request->tanggal_kembali])
-                      ->orWhereBetween('tanggal_kembali', [$request->tanggal_sewa, $request->tanggal_kembali])
-                      ->orWhere(function ($q) use ($request) {
-                          $q->where('tanggal_sewa', '<=', $request->tanggal_sewa)
-                            ->where('tanggal_kembali', '>=', $request->tanggal_kembali);
-                      });
-            })->exists();
+        $car = Car::findOrFail($request->car_id);
 
-        if ($isBooked) {
-            return redirect()->back()->withErrors(['car_id' => 'Gagal! Mobil tersebut sudah disewa pada rentang tanggal yang dipilih.'])->withInput();
+        $tglPinjam = Carbon::parse($request->tanggal_pinjam);
+        $tglKembali = Carbon::parse($request->tanggal_kembali);
+        $jumlahHari = $tglPinjam->diffInDays($tglKembali) ?: 1;
+        $totalHarga = $jumlahHari * $car->harga;
+
+        // Proses Unggah Bukti Pembayaran Manual oleh User
+        $buktiPath = null;
+        if ($request->hasFile('bukti_pembayaran')) {
+            $buktiPath = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
         }
 
         Transaction::create([
-            'user_id' => $request->user_id,
-            'car_id' => $request->car_id,
-            'tanggal_sewa' => $request->tanggal_sewa,
+            'user_id' => auth()->id(),
+            'car_id' => $car->id,
+            // PENTING: Gunakan 'tanggal_sewa' di sebelah kiri, tapi ambil dari request 'tanggal_pinjam' form HTML
+            'tanggal_sewa' => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
-            'status' => 'aktif',
+            'total_harga' => $totalHarga,
+            'bukti_pembayaran' => $buktiPath,
+            'status' => 'pending',
         ]);
 
-        return redirect()->route('transactions.index')->with('success', 'Data transaksi berhasil dicatat.');
+        return redirect()->route('transactions.index')->with('success', 'Pemesanan sukses diajukan! Harap tunggu verifikasi admin.');
     }
 
+    // Aksi Persetujuan Admin (Setujui)
+    public function approve(Transaction $transaction)
+    {
+        $transaction->update(['status' => 'disetujui']);
+
+        // Setelah disetujui, barulah status mobil berubah menjadi "tidak tersedia"
+        $transaction->car->update(['status_mobil' => 'tidak tersedia']);
+
+        return back()->with('success', 'Penyewaan disetujui! Status mobil otomatis terkunci.');
+    }
+
+    // Aksi Persetujuan Admin (Tolak)
+    public function reject(Transaction $transaction)
+    {
+        $transaction->update(['status' => 'ditolak']);
+        return back()->with('success', 'Pengajuan penyewaan telah ditolak.');
+    }
+
+    // Aksi Menyelesaikan Sesi Sewa (Mobil Dikembalikan)
     public function complete(Transaction $transaction)
     {
-        $tglSewa = Carbon::parse($transaction->tanggal_sewa);
-        $tglKembali = Carbon::parse($transaction->tanggal_kembali);
-        
-        $hari = $tglSewa->diffInDays($tglKembali);
-        if ($hari == 0) $hari = 1; 
+        $transaction->update(['status' => 'selesai']);
 
-        $totalHarga = $hari * $transaction->car->harga;
+        // Lepas status mobil kembali menjadi "tersedia"
+        $transaction->car->update(['status_mobil' => 'tersedia']);
 
-        $transaction->update([
-            'status' => 'selesai',
-            'total_harga' => $totalHarga
-        ]);
-
-        return redirect()->route('transactions.index')->with('success', 'Transaksi diselesaikan. Total harga telah dihitung.');
+        return redirect()->route('reports.index')->with('success', 'Transaksi selesai dan masuk laporan keuangan.');
     }
 
     public function destroy(Transaction $transaction)
     {
         $transaction->delete();
-        return redirect()->route('transactions.index')->with('success', 'Data transaksi berhasil dihapus.');
+        return back()->with('success', 'Transaksi berhasil dihapus.');
     }
 }

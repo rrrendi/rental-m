@@ -16,11 +16,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('car_id')->constrained()->onDelete('cascade');
-            $table->date('tanggal_sewa');
+            $table->date('tanggal_sewa'); // Sesuai dengan Model Anda
             $table->date('tanggal_kembali');
             $table->decimal('total_harga', 15, 2)->nullable();
-            // Menyesuaikan logika status multi-step sesuai simulasi laporan
-            $table->enum('status', ['pending', 'aktif', 'selesai'])->default('pending');
+            
+            // Tambahkan kolom bukti pembayaran
+            $table->string('bukti_pembayaran')->nullable(); 
+            
+            // Sesuaikan enum status dengan logika tolak/setujui
+            $table->enum('status', ['pending', 'disetujui', 'ditolak', 'selesai'])->default('pending');
+            
             $table->timestamps();
         });
     }

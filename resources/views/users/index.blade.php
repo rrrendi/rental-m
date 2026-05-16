@@ -33,7 +33,7 @@
                                 @endif
                             </td>
                             <td class="py-4 px-4 flex space-x-1">
-                                <button type="button" class="bg-[#00c0ef] text-white px-3 py-1.5 rounded text-xs shadow-sm hover:bg-cyan-500">Edit</button>
+                                <a href="{{ route('users.edit', $user->id) }}" class="bg-[#00c0ef] text-white px-3 py-1.5 rounded text-xs shadow-sm hover:bg-cyan-500 inline-block">Edit</a>
                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="bg-[#dd4b39] text-white px-3 py-1.5 rounded text-xs shadow-sm hover:bg-red-600" onclick="return confirm('Hapus pengguna ini?')">Delete</button>

@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Admin RENTAL-M',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('password123'), // Ganti dengan password yang aman
+            'password' => Hash::make('admin123'), // Ganti dengan password yang aman
             'role' => 'admin',
         ]);
     }

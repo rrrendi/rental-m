@@ -15,16 +15,15 @@ class Transaction extends Model
         'tanggal_sewa', 
         'tanggal_kembali', 
         'total_harga', 
+        'bukti_pembayaran', // <-- Tambahkan ini
         'status'
     ];
 
-    // Relasi ke tabel User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke tabel Car
     public function car()
     {
         return $this->belongsTo(Car::class);

@@ -26,8 +26,14 @@ class CarController extends Controller
             'merk' => 'required',
             'jenis' => 'required',
             'harga' => 'required|numeric',
-            'foto' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
+            'foto' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'status_mobil' => 'nullable|in:tersedia,tidak tersedia' // <-- Tambahkan ini
         ]);
+
+        // Jika status tidak diisi saat tambah, otomatis jadikan 'tersedia'
+        if (!isset($validated['status_mobil'])) {
+            $validated['status_mobil'] = 'tersedia';
+        }
 
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('cars', 'public');
@@ -50,7 +56,8 @@ class CarController extends Controller
             'merk' => 'required',
             'jenis' => 'required',
             'harga' => 'required|numeric',
-            'foto' => 'image|mimes:jpeg,png,jpg,webp|max:2048'
+            'foto' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+            'status_mobil' => 'required|in:tersedia,tidak tersedia' // <-- Tambahkan ini
         ]);
 
         if ($request->hasFile('foto')) {

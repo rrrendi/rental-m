@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('jenis');
             $table->decimal('harga', 15, 2);
             $table->string('foto')->nullable();
+            // Tambahkan baris ini untuk status ketersediaan mobil:
+            $table->enum('status_mobil', ['tersedia', 'tidak tersedia'])->default('tersedia');
             $table->timestamps();
         });
     }
